@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Builder
@@ -16,6 +16,7 @@ import lombok.*;
 @AllArgsConstructor
 public class UserEntity extends BaseTimeEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String phoneNum;

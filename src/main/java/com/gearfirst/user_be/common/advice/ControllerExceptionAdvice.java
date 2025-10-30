@@ -1,8 +1,8 @@
 package com.gearfirst.user_be.common.advice;
 
-import com.gearfirst.receipt.common.exception.BaseException;
-import com.gearfirst.receipt.common.response.ApiResponse;
-import com.gearfirst.receipt.common.response.ErrorStatus;
+import com.gearfirst.user_be.common.exception.BaseException;
+import com.gearfirst.user_be.common.response.ApiResponse;
+import com.gearfirst.user_be.common.response.ErrorStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

@@ -37,6 +37,7 @@ public class UserService {
                 .phoneNum(userRequest.getPhoneNum())
                 .workType(workType)
                 .region(region)
+                .rank(userRequest.getRank())
                 .build();
 
         userRepository.save(user);
