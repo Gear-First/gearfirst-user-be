@@ -1,6 +1,6 @@
 package com.gearfirst.user_be.common.config.kafka;
 
-import com.gearfirst.receipt.receiptHistory.dto.TestDto;
+import com.gearfirst.user_be.user.dto.TestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
