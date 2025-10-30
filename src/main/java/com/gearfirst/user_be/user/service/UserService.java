@@ -2,6 +2,7 @@ package com.gearfirst.user_be.user.service;
 
 import com.gearfirst.user_be.region.entity.RegionEntity;
 import com.gearfirst.user_be.region.repository.RegionRepository;
+import com.gearfirst.user_be.user.dto.RegistResponse;
 import com.gearfirst.user_be.user.dto.UserRequest;
 import com.gearfirst.user_be.user.dto.UserResponse;
 import com.gearfirst.user_be.user.entity.UserEntity;
@@ -11,6 +12,7 @@ import com.gearfirst.user_be.workType.repository.WorkTypeRepositoy;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +22,7 @@ public class UserService {
     private final WorkTypeRepositoy workTypeRepositoy;
     private final RegionRepository regionRepository;
 
-    public void registUser(UserRequest userRequest) {
+    public RegistResponse registUser(UserRequest userRequest) {
         RegionEntity region = regionRepository.findById(userRequest.getRegionId())
                 .orElseThrow(() -> new IllegalArgumentException("지역 정보를 찾을 수 없습니다."));
 
@@ -41,10 +43,15 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+
+        return RegistResponse.builder()
+                .userId(user.getId())
+                .build();
     }
 
-    public UserResponse getUser(String email){
-        UserEntity entity = userRepository.findByEmail(email);
+    public UserResponse getUser(Long userId){
+        UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 사용자를 찾을 수 없습니다."));
 
         return UserResponse.builder()
                 .id(entity.getId())

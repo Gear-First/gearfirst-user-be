@@ -2,6 +2,7 @@ package com.gearfirst.user_be.user.controller;
 
 import com.gearfirst.user_be.common.response.ApiResponse;
 import com.gearfirst.user_be.common.response.SuccessStatus;
+import com.gearfirst.user_be.user.dto.RegistResponse;
 import com.gearfirst.user_be.user.dto.UserRequest;
 import com.gearfirst.user_be.user.dto.UserResponse;
 import com.gearfirst.user_be.user.service.UserService;
@@ -18,15 +19,15 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/registUser")
-    public ResponseEntity<ApiResponse<Void>> registUser(@RequestBody UserRequest userRequest) {
-        userService.registUser(userRequest);
+    public ResponseEntity<ApiResponse<RegistResponse>> registUser(@RequestBody UserRequest userRequest) {
+        RegistResponse registUser = userService.registUser(userRequest);
 
-        return ApiResponse.success_only(SuccessStatus.REGIST_USER_SUCCESS);
+        return ApiResponse.success(SuccessStatus.REGIST_USER_SUCCESS, registUser);
     }
 
     @GetMapping("getUser")
-    public ResponseEntity<ApiResponse<UserResponse>> getUser(@RequestParam String email){
-        UserResponse entity = userService.getUser(email);
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(@RequestParam Long userId){
+        UserResponse entity = userService.getUser(userId);
 
         return ApiResponse.success(SuccessStatus.GET_USER_SUCCESS ,entity);
     }
