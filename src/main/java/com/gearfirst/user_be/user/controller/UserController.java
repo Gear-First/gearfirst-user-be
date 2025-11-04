@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/registUser")
-    public ResponseEntity<ApiResponse<RegistResponse>> registUser(@RequestBody UserRequest userRequest) {
-        RegistResponse registUser = userService.registUser(userRequest);
+    @PostMapping("/registerUser")
+    public ResponseEntity<ApiResponse<RegistResponse>> registerUser(@RequestBody UserRequest userRequest) {
+        RegistResponse registerUser = userService.registerUser(userRequest);
 
-        return ApiResponse.success(SuccessStatus.REGIST_USER_SUCCESS, registUser);
+        return ApiResponse.success(SuccessStatus.REGIST_USER_SUCCESS, registerUser);
     }
 
     @GetMapping("getUser")
