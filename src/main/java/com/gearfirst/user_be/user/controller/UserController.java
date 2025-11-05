@@ -24,12 +24,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @Operation(summary = "회원 등록", description = "신규 회원을 등록한다.")
-    @PostMapping("/registUser")
-    public ResponseEntity<ApiResponse<RegistResponse>> registUser(@RequestBody UserRequest userRequest) {
-        RegistResponse registUser = userService.registUser(userRequest);
 
-        return ApiResponse.success(SuccessStatus.REGIST_USER_SUCCESS, registUser);
+    @Operation(summary = "회원 등록", description = "신규 회원을 등록한다.")
+    @PostMapping("/registerUser")
+    public ResponseEntity<ApiResponse<RegistResponse>> registerUser(@RequestBody UserRequest userRequest) {
+        RegistResponse registerUser = userService.registerUser(userRequest);
+        return ApiResponse.success(SuccessStatus.REGIST_USER_SUCCESS, registerUser);
     }
 
     @Operation(summary = "전체 사용자 조회", description = "전체 사용자 리스트를 조회한다.")

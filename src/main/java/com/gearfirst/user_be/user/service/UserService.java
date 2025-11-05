@@ -14,9 +14,11 @@ import com.gearfirst.user_be.workType.repository.WorkTypeRepositoy;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -72,7 +74,7 @@ public class UserService {
                 .build();
     }
 
-    public RegistResponse registUser(UserRequest userRequest) {
+    public RegistResponse registerUser(UserRequest userRequest) {
         RegionEntity region = regionRepository.findById(userRequest.getRegionId())
                 .orElseThrow(() -> new IllegalArgumentException("지역 정보를 찾을 수 없습니다."));
 
