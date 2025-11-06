@@ -8,6 +8,7 @@ public class UserRequest {
     private Long UserId;
     private String name;
     private String email;
+    private String password;
     private String phoneNum;
     private Rank rank;
     private Long regionId;
