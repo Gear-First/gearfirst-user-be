@@ -1,10 +1,13 @@
 package com.gearfirst.user_be.user.service;
 
+import com.gearfirst.user_be.common.exception.ConflictException;
+import com.gearfirst.user_be.common.exception.NotFoundException;
+import com.gearfirst.user_be.common.response.ErrorStatus;
+import com.gearfirst.user_be.mail.service.MailService;
 import com.gearfirst.user_be.region.entity.RegionEntity;
 import com.gearfirst.user_be.region.repository.RegionRepository;
-import com.gearfirst.user_be.user.dto.RegistResponse;
-import com.gearfirst.user_be.user.dto.UserRequest;
-import com.gearfirst.user_be.user.dto.UserResponse;
+import com.gearfirst.user_be.user.client.AuthClient;
+import com.gearfirst.user_be.user.dto.*;
 import com.gearfirst.user_be.user.entity.UserEntity;
 import com.gearfirst.user_be.user.enums.Rank;
 import com.gearfirst.user_be.user.repository.UserRepository;
@@ -15,11 +18,13 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final WorkTypeRepositoy workTypeRepository;
     private final RegionRepository regionRepository;
+    private final AuthClient authClient;
+    private final MailService mailService;
 
     public void updateUser(UserRequest request) {
         UserEntity entity = userRepository.findById(request.getUserId())
@@ -73,19 +80,23 @@ public class UserService {
                 .email(entity.getEmail())
                 .build();
     }
-
-    public RegistResponse registerUser(UserRequest userRequest) {
+    @Transactional
+    public void registerUser(CreateUserRequest userRequest) {
         RegionEntity region = regionRepository.findById(userRequest.getRegionId())
                 .orElseThrow(() -> new IllegalArgumentException("지역 정보를 찾을 수 없습니다."));
 
         WorkTypeEntity workType = workTypeRepository.findById(userRequest.getWorkTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("근무 지점을 찾을 수 없습니다."));
 
-        UserEntity user = userRepository.findByEmail(userRequest.getEmail());
+        if (userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
+            throw new ConflictException(ErrorStatus.DUPLICATE_EMAIL_EXCEPTION.getMessage());
+        }
 
-        if(user != null) throw new EntityExistsException("사용중인 이메일입니다.");
 
-        user = UserEntity.builder()
+        String tempPassword = RandomStringUtils.random(10, true, true);
+
+        //user 먼저 저장
+        UserEntity user = UserEntity.builder()
                 .email(userRequest.getEmail())
                 .name(userRequest.getName())
                 .phoneNum(userRequest.getPhoneNum())
@@ -96,9 +107,20 @@ public class UserService {
 
         userRepository.save(user);
 
-        return RegistResponse.builder()
-                .userId(user.getId())
-                .build();
+        //Auth 서버 호출 서버 실패시 예외 발생 -> 자동 롤백
+        try {
+            authClient.createAccount(new CreateAccountRequest(user.getEmail(), tempPassword));
+        } catch (Exception e) {
+            // Auth 서버 통신 실패 시 롤백
+            throw new IllegalStateException("Auth 서버 계정 생성 중 오류가 발생했습니다: " + e.getMessage());
+        }
+
+        //  이메일 발송
+        try {
+            mailService.sendUserRegistrationMail(userRequest.getPersonalEmail(), user.getName(), tempPassword);
+        } catch (Exception e) {
+            throw new IllegalStateException("메일 발송 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     public UserResponse getUser(Long userId){
@@ -119,7 +141,8 @@ public class UserService {
     }
 
     public void deleteUser(String email) {
-        UserEntity entity = userRepository.findByEmail(email);
+        UserEntity entity = userRepository.findByEmail(email)
+                .orElseThrow(()-> new NotFoundException(ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         if(entity == null) throw new EntityNotFoundException("해당 사용자가 없습니다.");
 
