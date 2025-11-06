@@ -13,6 +13,9 @@ public class CreateUserRequest {
     private String name;
     @Email
     @NotBlank
+    private String personalEmail;
+    @Email
+    @NotBlank
     private String email;
     @Pattern(regexp = "^[0-9]{10,11}$", message = "전화번호는 숫자 10~11자리여야 합니다.")
     private String phoneNum;

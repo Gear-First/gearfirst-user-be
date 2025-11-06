@@ -1,5 +1,8 @@
 package com.gearfirst.user_be.user.service;
 
+import com.gearfirst.user_be.common.exception.ConflictException;
+import com.gearfirst.user_be.common.exception.NotFoundException;
+import com.gearfirst.user_be.common.response.ErrorStatus;
 import com.gearfirst.user_be.mail.service.MailService;
 import com.gearfirst.user_be.region.entity.RegionEntity;
 import com.gearfirst.user_be.region.repository.RegionRepository;
@@ -78,21 +81,22 @@ public class UserService {
                 .build();
     }
     @Transactional
-    public RegistResponse registerUser(CreateUserRequest userRequest) {
+    public void registerUser(CreateUserRequest userRequest) {
         RegionEntity region = regionRepository.findById(userRequest.getRegionId())
                 .orElseThrow(() -> new IllegalArgumentException("지역 정보를 찾을 수 없습니다."));
 
         WorkTypeEntity workType = workTypeRepository.findById(userRequest.getWorkTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("근무 지점을 찾을 수 없습니다."));
 
-        UserEntity user = userRepository.findByEmail(userRequest.getEmail());
+        if (userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
+            throw new ConflictException(ErrorStatus.DUPLICATE_EMAIL_EXCEPTION.getMessage());
+        }
 
-        if(user != null) throw new EntityExistsException("사용중인 이메일입니다.");
 
         String tempPassword = RandomStringUtils.random(10, true, true);
 
         //user 먼저 저장
-        user = UserEntity.builder()
+        UserEntity user = UserEntity.builder()
                 .email(userRequest.getEmail())
                 .name(userRequest.getName())
                 .phoneNum(userRequest.getPhoneNum())
@@ -111,16 +115,12 @@ public class UserService {
             throw new IllegalStateException("Auth 서버 계정 생성 중 오류가 발생했습니다: " + e.getMessage());
         }
 
-        // 5️ 이메일 발송
+        //  이메일 발송
         try {
-            mailService.sendUserRegistrationMail(user.getEmail(), user.getName(), tempPassword);
+            mailService.sendUserRegistrationMail(userRequest.getPersonalEmail(), user.getName(), tempPassword);
         } catch (Exception e) {
             throw new IllegalStateException("메일 발송 중 오류가 발생했습니다: " + e.getMessage());
         }
-
-        return RegistResponse.builder()
-                .userId(user.getId())
-                .build();
     }
 
     public UserResponse getUser(Long userId){
@@ -141,7 +141,8 @@ public class UserService {
     }
 
     public void deleteUser(String email) {
-        UserEntity entity = userRepository.findByEmail(email);
+        UserEntity entity = userRepository.findByEmail(email)
+                .orElseThrow(()-> new NotFoundException(ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         if(entity == null) throw new EntityNotFoundException("해당 사용자가 없습니다.");
 

@@ -30,15 +30,14 @@ public class MailServiceImpl implements MailService {
     private String buildMailContent(String name, String tempPassword) {
         return """
                 <div style="font-family:Arial,sans-serif; line-height:1.6;">
-                    <h2>안녕하세요, %s 님 👋</h2>
+                    <h2>안녕하세요, %s 님</h2>
                     <p>GearFirst 시스템에 새로운 계정이 생성되었습니다.</p>
                     <hr/>
-                    <p><b>이메일:</b> %s</p>
                     <p><b>임시 비밀번호:</b> %s</p>
                     <hr/>
                     <p>처음 로그인 후 반드시 비밀번호를 변경해주세요.</p>
                     <p>감사합니다.<br/>GearFirst 운영팀 드림</p>
                 </div>
-                """.formatted(name, name.toLowerCase() + "@gearfirst.com", tempPassword);
+                """.formatted(name, tempPassword);
     }
 }

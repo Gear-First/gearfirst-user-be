@@ -2,10 +2,7 @@ package com.gearfirst.user_be.user.controller;
 
 import com.gearfirst.user_be.common.response.ApiResponse;
 import com.gearfirst.user_be.common.response.SuccessStatus;
-import com.gearfirst.user_be.user.dto.PageResponse;
-import com.gearfirst.user_be.user.dto.RegistResponse;
-import com.gearfirst.user_be.user.dto.UserRequest;
-import com.gearfirst.user_be.user.dto.UserResponse;
+import com.gearfirst.user_be.user.dto.*;
 import com.gearfirst.user_be.user.enums.Rank;
 import com.gearfirst.user_be.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,9 +24,9 @@ public class UserController {
 
     @Operation(summary = "회원 등록", description = "신규 회원을 등록한다.")
     @PostMapping("/registerUser")
-    public ResponseEntity<ApiResponse<RegistResponse>> registerUser(@RequestBody UserRequest userRequest) {
-        RegistResponse registerUser = userService.registerUser(userRequest);
-        return ApiResponse.success(SuccessStatus.REGIST_USER_SUCCESS, registerUser);
+    public ResponseEntity<ApiResponse<Void>> registerUser(@RequestBody CreateUserRequest userRequest) {
+        userService.registerUser(userRequest);
+        return ApiResponse.success_only(SuccessStatus.REGIST_USER_SUCCESS);
     }
 
     @Operation(summary = "전체 사용자 조회", description = "전체 사용자 리스트를 조회한다.")
