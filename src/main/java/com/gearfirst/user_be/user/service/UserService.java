@@ -2,6 +2,8 @@ package com.gearfirst.user_be.user.service;
 
 import com.gearfirst.user_be.region.entity.RegionEntity;
 import com.gearfirst.user_be.region.repository.RegionRepository;
+import com.gearfirst.user_be.user.client.AuthClient;
+import com.gearfirst.user_be.user.dto.CreateAccountRequest;
 import com.gearfirst.user_be.user.dto.RegistResponse;
 import com.gearfirst.user_be.user.dto.UserRequest;
 import com.gearfirst.user_be.user.dto.UserResponse;
@@ -28,6 +30,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final WorkTypeRepositoy workTypeRepository;
     private final RegionRepository regionRepository;
+    private final AuthClient authClient;
 
     public void updateUser(UserRequest request) {
         UserEntity entity = userRepository.findById(request.getUserId())
@@ -86,7 +89,9 @@ public class UserService {
 
         if(user != null) throw new EntityExistsException("사용중인 이메일입니다.");
 
+        String tempPassword = RandomStringUtils.random(10, true, true);
 
+        //user 먼저 저장
         user = UserEntity.builder()
                 .email(userRequest.getEmail())
                 .name(userRequest.getName())
@@ -97,6 +102,14 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+
+        //Auth 서버 호출 서버 실패시 예외 발생 -> 자동 롤백
+        try {
+            authClient.createAccount(new CreateAccountRequest(user.getEmail(), tempPassword));
+        } catch (Exception e) {
+            // Auth 서버 통신 실패 시 롤백
+            throw new IllegalStateException("Auth 서버 계정 생성 중 오류가 발생했습니다: " + e.getMessage());
+        }
 
         return RegistResponse.builder()
                 .userId(user.getId())
