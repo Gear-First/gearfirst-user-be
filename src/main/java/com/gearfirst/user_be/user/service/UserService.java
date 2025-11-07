@@ -103,7 +103,7 @@ public class UserService {
 
         //Auth 서버 호출 서버 실패시 예외 발생 -> 자동 롤백
         try {
-            authClient.createAccount(new CreateAccountRequest(user.getEmail(), userRequest.getPersonalEmail()));
+            authClient.createAccount(new CreateAccountRequest(user.getId(),user.getEmail(), userRequest.getPersonalEmail()));
         } catch (Exception e) {
             // Auth 서버 통신 실패 시 롤백
             throw new IllegalStateException("Auth 서버 계정 생성 중 오류가 발생했습니다: " + e.getMessage());
