@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CreateAccountRequest {
-    private Long userId;
     private String email;
     private String personalEmail;
 }
