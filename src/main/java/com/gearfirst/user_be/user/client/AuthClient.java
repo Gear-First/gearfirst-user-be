@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface AuthClient {
 
     @PostMapping("/api/v1/auth/signup")
-    void createAccount(@RequestBody CreateAccountRequest request);
+    String createAccount(@RequestBody CreateAccountRequest request);
 }
