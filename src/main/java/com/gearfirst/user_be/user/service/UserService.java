@@ -3,7 +3,6 @@ package com.gearfirst.user_be.user.service;
 import com.gearfirst.user_be.common.exception.ConflictException;
 import com.gearfirst.user_be.common.exception.NotFoundException;
 import com.gearfirst.user_be.common.response.ErrorStatus;
-import com.gearfirst.user_be.mail.service.MailService;
 import com.gearfirst.user_be.region.entity.RegionEntity;
 import com.gearfirst.user_be.region.repository.RegionRepository;
 import com.gearfirst.user_be.user.client.AuthClient;
@@ -33,7 +32,6 @@ public class UserService {
     private final WorkTypeRepositoy workTypeRepository;
     private final RegionRepository regionRepository;
     private final AuthClient authClient;
-    private final MailService mailService;
 
     public void updateUser(UserRequest request) {
         UserEntity entity = userRepository.findById(request.getUserId())
@@ -91,10 +89,6 @@ public class UserService {
         if (userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
             throw new ConflictException(ErrorStatus.DUPLICATE_EMAIL_EXCEPTION.getMessage());
         }
-
-
-        String tempPassword = RandomStringUtils.random(10, true, true);
-
         //user 먼저 저장
         UserEntity user = UserEntity.builder()
                 .email(userRequest.getEmail())
@@ -109,17 +103,10 @@ public class UserService {
 
         //Auth 서버 호출 서버 실패시 예외 발생 -> 자동 롤백
         try {
-            authClient.createAccount(new CreateAccountRequest(user.getEmail(), tempPassword));
+            authClient.createAccount(new CreateAccountRequest(user.getEmail(), userRequest.getPersonalEmail()));
         } catch (Exception e) {
             // Auth 서버 통신 실패 시 롤백
             throw new IllegalStateException("Auth 서버 계정 생성 중 오류가 발생했습니다: " + e.getMessage());
-        }
-
-        //  이메일 발송
-        try {
-            mailService.sendUserRegistrationMail(userRequest.getPersonalEmail(), user.getName(), tempPassword);
-        } catch (Exception e) {
-            throw new IllegalStateException("메일 발송 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
