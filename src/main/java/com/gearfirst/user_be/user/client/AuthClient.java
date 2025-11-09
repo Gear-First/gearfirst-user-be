@@ -10,4 +10,7 @@ public interface AuthClient {
 
     @PostMapping("/api/v1/auth/signup")
     String createAccount(@RequestBody CreateAccountRequest request);
+
+    @PostMapping("/api/v1/auth/delete")
+    void deleteUser(@RequestBody Long userId);
 }

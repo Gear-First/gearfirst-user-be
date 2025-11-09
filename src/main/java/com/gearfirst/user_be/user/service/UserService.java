@@ -1,6 +1,7 @@
 package com.gearfirst.user_be.user.service;
 
 import com.gearfirst.user_be.common.exception.ConflictException;
+import com.gearfirst.user_be.common.exception.InternalServerException;
 import com.gearfirst.user_be.common.exception.NotFoundException;
 import com.gearfirst.user_be.common.response.ErrorStatus;
 import com.gearfirst.user_be.region.entity.RegionEntity;
@@ -127,13 +128,18 @@ public class UserService {
                 .workType(entity.getWorkType().getWorkTypeName())
                 .build();
     }
-
+    @Transactional
     public void deleteUser(String email) {
         UserEntity entity = userRepository.findByEmail(email)
                 .orElseThrow(()-> new NotFoundException(ErrorStatus.NOT_FOUND_USER_EXCEPTION.getMessage()));
 
         if(entity == null) throw new EntityNotFoundException("해당 사용자가 없습니다.");
-
         userRepository.delete(entity);
+        try {
+            authClient.deleteUser(entity.getId());
+        } catch (Exception e) {
+            throw new InternalServerException(ErrorStatus.FAIL_DELETE_USER.getMessage());
+        }
+
     }
 }

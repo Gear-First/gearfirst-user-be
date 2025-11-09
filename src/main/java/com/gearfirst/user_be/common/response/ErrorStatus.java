@@ -21,7 +21,7 @@ public enum ErrorStatus {
 
     /** 500 SERVER_ERROR */
     FAIL_UPLOAD_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"파일 업로드 실패하였습니다."),
-
+    FAIL_DELETE_USER(HttpStatus.INTERNAL_SERVER_ERROR, "유저 삭제를 실패했습니다.")
     ;
 
     private final HttpStatus httpStatus;
