@@ -1,5 +1,7 @@
 package com.gearfirst.user_be.user.service;
 
+import com.gearfirst.user_be.common.config.annotation.CurrentUser;
+import com.gearfirst.user_be.common.context.UserContext;
 import com.gearfirst.user_be.common.exception.ConflictException;
 import com.gearfirst.user_be.common.exception.InternalServerException;
 import com.gearfirst.user_be.common.exception.NotFoundException;
@@ -25,6 +27,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.management.relation.Role;
 
 @Service
 @RequiredArgsConstructor
@@ -141,5 +145,10 @@ public class UserService {
             throw new InternalServerException(ErrorStatus.FAIL_DELETE_USER.getMessage());
         }
 
+    }
+    public RoleResponse getUserInfo(UserContext user){
+        RoleResponse res = new RoleResponse();
+        res.setWorkType(user.getWorkType());
+        return res;
     }
 }
