@@ -78,6 +78,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<String>> me(@CurrentUser UserContext user) {
         String workType = user.getWorkType();
+        System.out.print("workType: "+ workType);
         return ApiResponse.success(SuccessStatus.GET_USER_WORK_TYPE_SUCCESS,workType);
     }
 
