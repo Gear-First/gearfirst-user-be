@@ -146,9 +146,5 @@ public class UserService {
         }
 
     }
-    public RoleResponse getUserInfo(UserContext user){
-        RoleResponse res = new RoleResponse();
-        res.setWorkType(user.getWorkType());
-        return res;
-    }
+
 }

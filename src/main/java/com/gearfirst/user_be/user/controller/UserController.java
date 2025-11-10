@@ -76,8 +76,8 @@ public class UserController {
         return ApiResponse.success_only(SuccessStatus.DELETE_USER_SUCCESS);
     }
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<RoleResponse>> me(@CurrentUser UserContext user) {
-        RoleResponse response = userService.getUserInfo(user);
+    public ResponseEntity<ApiResponse<String>> me(@CurrentUser UserContext user) {
+        String response = user.getWorkType();
         return ApiResponse.success(SuccessStatus.GET_USER_WORK_TYPE_SUCCESS,response);
     }
 
