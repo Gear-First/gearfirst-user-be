@@ -16,6 +16,7 @@ public enum SuccessStatus {
     GET_WORKTYPE_SUCCESS(HttpStatus.OK, "지점 리스트 조회 성공"),
     GET_ALL_USER_SUCCESS(HttpStatus.OK, "전체 사용자 조회 성공"),
     UPDATE_USER_SUCCESS(HttpStatus.OK, "사용자 수정 성공"),
+    GET_USER_WORK_TYPE_SUCCESS(HttpStatus.OK, "사용자 근무타입 조회 성공"),
 
     /** 201 CREATED */
     CREATE_SAMPLE_SUCCESS(HttpStatus.CREATED, "샘플 등록 성공"),

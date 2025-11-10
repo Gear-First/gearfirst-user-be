@@ -1,5 +1,7 @@
 package com.gearfirst.user_be.user.controller;
 
+import com.gearfirst.user_be.common.config.annotation.CurrentUser;
+import com.gearfirst.user_be.common.context.UserContext;
 import com.gearfirst.user_be.common.response.ApiResponse;
 import com.gearfirst.user_be.common.response.SuccessStatus;
 import com.gearfirst.user_be.user.dto.*;
@@ -73,4 +75,10 @@ public class UserController {
 
         return ApiResponse.success_only(SuccessStatus.DELETE_USER_SUCCESS);
     }
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<String>> me(@CurrentUser UserContext user) {
+        String workType = user.getWorkType();
+        return ApiResponse.success(SuccessStatus.GET_USER_WORK_TYPE_SUCCESS,workType);
+    }
+
 }
